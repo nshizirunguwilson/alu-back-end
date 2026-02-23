@@ -39,6 +39,18 @@ def main():
 
     todos = todos_resp.json()
 
+    # total_tasks = len(todos)
+    # completed_tasks = [t for t in todos if t.get("completed") is True]
+    # done_tasks = len(completed_tasks)
+
+    # # Output (EXACT format)
+    # print(
+    #     f"Employee {employee_name} is done \
+    #     with tasks({done_tasks}/{total_tasks}):"
+    # )
+
+    # for task in completed_tasks:
+    #     print(f"\t {task.get('title')}")
 
     filename = f"{user_id}.csv"
     with open(filename, mode="w", newline="", encoding="utf-8") as csvfile:

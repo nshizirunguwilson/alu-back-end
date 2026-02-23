@@ -1,52 +1,50 @@
 #!/usr/bin/python3
 """
-Python script that exports data in the JSON format
+Fetch and display an employee's TODO list progress
+from https://jsonplaceholder.typicode.com
 """
+
 import json
 import requests
-
-
-def get_all_users():
-    """
-    Get the list of all users
-    """
-    url = "https://jsonplaceholder.typicode.com/users"
-    response = requests.get(url)
-    return response.json()
-
-
-def get_user_todos(user_id):
-    """
-    Get the TODO list for a given user ID
-    """
-    url = "https://jsonplaceholder.typicode.com/todos"
-    response = requests.get(url, params={"userId": user_id})
-    return response.json()
-
-
-def export_all_todos_to_json(users):
-    """
-    Export all users' TODO lists to a JSON file
-    """
-    data = {
-        user["id"]: [
-            {
-                "username": user["username"],
-                "task": todo["title"],
-                "completed": todo["completed"]
-            } for todo in get_user_todos(user["id"])
-        ] for user in users
-    }
-    with open("todo_all_employees.json", "w") as jsonfile:
-        json.dump(data, jsonfile)
+import sys
 
 
 def main():
-    """
-    Main function to fetch users and their TODO lists, then export to JSON
-    """
-    users = get_all_users()
-    export_all_todos_to_json(users)
+    base_url = "https://jsonplaceholder.typicode.com"
+
+    # Fetch employee info
+    users_resp = requests.get(f"{base_url}/users")
+    if users_resp.status_code != 200:
+        sys.exit(1)
+
+    users = users_resp.json()
+
+    # Fetch todos
+    todos_resp = requests.get(f"{base_url}/todos")
+    todos = todos_resp.json()
+
+    user_map = {}
+    for user in users:
+        user_map[user.get('id')] = user.get('username')
+
+    all_tasks = {}
+    for task in todos:
+        user_id = task.get('userId')
+        user_id_str = str(user_id)
+
+        if user_id_str not in all_tasks:
+            all_tasks[user_id_str] = []
+
+        all_tasks[user_id_str].append({
+            "username": user_map[user_id],
+            "task": task.get('title'),
+            "completed": task.get('completed')
+        })
+
+    filename = "todo_all_employees.json"
+
+    with open(filename, mode="w", encoding="utf-8") as jsonfile:
+        json.dump(all_tasks, jsonfile)
 
 if __name__ == "__main__":
     main()
