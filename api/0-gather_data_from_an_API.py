@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-Using a REST API, and a given emp_ID, return info about their TODO list.
+Using a REST API, and a given employee ID,
+return info about their TODO list progress.
 """
 import requests
 import sys
@@ -14,14 +15,11 @@ if __name__ == "__main__":
     EMPLOYEE_NAME = employee.get("name")
     employee_todos = requests.get(
         BASE_URL + f'/users/{sys.argv[1]}/todos').json()
-    serialized_todos = {}
 
-    for todo in employee_todos:
-        serialized_todos.update({todo.get("title"): todo.get("completed")})
+    TOTAL = len(employee_todos)
+    completed = [t for t in employee_todos if t.get("completed")]
 
-    COMPLETED_LEN = len([k for k, v in serialized_todos.items() if v is True])
     print("Employee {} is done with tasks({}/{}):".format(
-        EMPLOYEE_NAME, COMPLETED_LEN, len(serialized_todos)))
-    for key, val in serialized_todos.items():
-        if val is True:
-            print("\t {}".format(key))
+        EMPLOYEE_NAME, len(completed), TOTAL))
+    for task in completed:
+        print("\t {}".format(task.get("title")))
