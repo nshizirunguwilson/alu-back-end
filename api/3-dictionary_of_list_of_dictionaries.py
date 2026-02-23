@@ -31,9 +31,9 @@ def export_all_todos_to_json(users):
     data = {
         user["id"]: [
             {
+                "username": user["username"],
                 "task": todo["title"],
-                "completed": todo["completed"],
-                "username": user["username"]
+                "completed": todo["completed"]
             } for todo in get_user_todos(user["id"])
         ] for user in users
     }
